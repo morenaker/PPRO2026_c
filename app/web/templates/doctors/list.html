@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Lékaři{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Lékaři</h1>
+      <p class="sub">Ordinační hodiny po dnech v týdnu. Dnešek je zvýrazněný.</p>
+    </div>
+  </div>
+
+  {% if doctors %}
+    <div class="doctors">
+      {% for d in doctors %}
+        <section class="panel" aria-labelledby="doc-{{ d.id }}">
+          <div class="panel-head"><h2 id="doc-{{ d.id }}">{{ d.full_name }}</h2></div>
+          <ul class="hours">
+            {% for oh in d.office_hours | sort(attribute='start_time') | sort(attribute='weekday') %}
+              <li class="{{ 'is-today' if oh.weekday == today_weekday }}">
+                <abbr class="wd" title="{{ weekdays[oh.weekday] }}">{{ weekdays_short[oh.weekday] }}</abbr>
+                <span class="span">{{ oh.start_time | hm }}–{{ oh.end_time | hm }}</span>
+                <span class="where">{{ oh.location }}
+                  {% if not oh.bookable %}<span class="badge warn">bez objednávání</span>{% endif %}</span>
+              </li>
+            {% else %}
+              <li class="empty">Bez ordinačních hodin.</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="panel">
+      <div class="empty">
+        <h3>Zatím žádní lékaři</h3>
+        <p>Lékaře a jejich ordinační hodiny zakládá správce.</p>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge, czech_count %}
+{% block title %}Přehled{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{{ today_label }}</h1>
+      <p class="sub">Dobrý den, {{ user.name }}.</p>
+    </div>
+    <div class="tools">
+      <a class="btn secondary" href="/pacienti">Najít pacienta</a>
+      <a class="btn" href="/pacienti/novy">Nový pacient</a>
+    </div>
+  </div>
+
+  {% if summary.patients == 0 and summary.doctors == 0 %}
+    <section class="panel">
+      <div class="empty">
+        <h3>Zatím tu nejsou žádná data</h3>
+        {% if user.role == 'admin' %}
+          <p>Pro předvedení aplikace přidáte ukázkové pacienty, lékaře a rezervace v Nastavení.</p>
+          <a class="btn" href="/nastaveni">Otevřít nastavení</a>
+        {% else %}
+          <p>Začněte založením prvního pacienta. Ukázková data může přidat správce v Nastavení.</p>
+          <a class="btn" href="/pacienti/novy">Nový pacient</a>
+        {% endif %}
+      </div>
+    </section>
+  {% else %}
+    <div class="layout-split">
+      <section class="panel" aria-labelledby="today-h">
+        <div class="panel-head">
+          <h2 id="today-h">Dnes objednaní</h2>
+          <span class="count">{{ czech_count(today | length, 'rezervace', 'rezervace', 'rezervací') }}</span>
+        </div>
+        {% if today %}
+          <ul class="agenda compact">
+            {% for a in today %}
+              <li class="slot{{ ' is-cancelled' if a.status == 'cancelled' }}">
+                <span class="time">{{ a.starts_at | hm }}<span class="end">{{ a.ends_at | hm }}</span></span>
+                <span>
+                  <span class="who">{{ a.patient.last_name }} {{ a.patient.first_name }}</span><br>
+                  <span class="why">{{ a.reason }} · {{ a.doctor.full_name }}</span>
+                </span>
+                <span class="state">{{ status_badge(a.status) }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+          <div class="panel-note"><a href="/rezervace">Celý diář</a></div>
+        {% else %}
+          <div class="empty">
+            <h3>Dnes nikdo objednaný není</h3>
+            <p>Nadcházející rezervace najdete v diáři.</p>
+            <a class="btn secondary" href="/rezervace">Otevřít diář</a>
+          </div>
+        {% endif %}
+      </section>
+
+      <div class="stack">
+        <section class="panel" aria-labelledby="roster-h">
+          <div class="panel-head"><h2 id="roster-h">Dnes ordinuje</h2></div>
+          {% set ns = namespace(working=0) %}
+          <ul class="roster">
+            {% for d in doctors %}
+              {% set hours = d.office_hours | selectattr('weekday', 'equalto', today_weekday) | sort(attribute='start_time') | list %}
+              {% if hours %}
+                {% set ns.working = ns.working + 1 %}
+                <li>
+                  <div class="who">{{ d.full_name }}</div>
+                  {% for oh in hours %}
+                    <div class="when">{{ oh.start_time | hm }}–{{ oh.end_time | hm }} · {{ oh.location }}
+                      {% if not oh.bookable %}<span class="badge warn">bez objednávání</span>{% endif %}</div>
+                  {% endfor %}
+                </li>
+              {% endif %}
+            {% endfor %}
+            {% if ns.working == 0 %}
+              <li class="muted">Dnes nikdo neordinuje.</li>
+            {% endif %}
+          </ul>
+          <div class="panel-note"><a href="/lekari">Ordinační hodiny celého týdne</a></div>
+        </section>
+
+        <section class="panel" aria-labelledby="facts-h">
+          <div class="panel-head"><h2 id="facts-h">V evidenci</h2></div>
+          <div class="panel-body flush-top">
+            <dl class="facts">
+              <div><dt><a href="/rezervace">Nadcházející rezervace</a></dt><dd>{{ summary.upcoming }}</dd></div>
+              <div><dt><a href="/pacienti">Pacienti</a></dt><dd>{{ summary.patients }}</dd></div>
+              <div><dt><a href="/lekari">Lékaři</a></dt><dd>{{ summary.doctors }}</dd></div>
+              <div><dt>Zrušené rezervace</dt><dd>{{ summary.cancelled }}</dd></div>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

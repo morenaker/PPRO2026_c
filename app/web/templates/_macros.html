@@ -1,0 +1,20 @@
+{# Sdílené kousky šablon. #}
+
+{% macro brand_mark() -%}
+  {# Značka: obrys kopce s vyhlídkou na zaobleném čtverci. Barvy dodává CSS. #}
+  <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true">
+    <rect class="tile" width="28" height="28" rx="7"/>
+    <path class="line" d="M5 20.5c2.6 0 3.8-4.5 6.6-4.5 2.4 0 3 2.6 4.8 2.6 1.9 0 2.6-6.6 6.6-6.6"/>
+    <path class="line" d="M19.5 7.5v4.5"/>
+  </svg>
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+  {% if status == 'cancelled' %}<span class="badge danger">Zrušeno</span>
+  {% elif status == 'completed' %}<span class="badge ok">Proběhlo</span>
+  {% else %}<span class="badge info">Objednáno</span>{% endif %}
+{%- endmacro %}
+
+{% macro czech_count(n, one, few, many) -%}
+  {{ n }} {{ one if n == 1 else (few if 2 <= n <= 4 else many) }}
+{%- endmacro %}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Ordinace{% endblock %} · Na Vyhlídce</title>
+  <link rel="stylesheet" href="/static/css/app.css?v={{ css_version }}">
+</head>
+<body>
+  {% from "_macros.html" import brand_mark %}
+  <header class="nav">
+    <nav class="nav-inner" aria-label="Hlavní navigace">
+      <a class="brand" href="/">{{ brand_mark() }}<span>Na Vyhlídce</span></a>
+      {% if user %}
+        {% for item in nav_items %}
+          {% if not item.admin_only or user.role == 'admin' %}
+            <a class="nav-link{% if active == item.key %} active{% endif %}" href="{{ item.href }}"
+               {% if active == item.key %}aria-current="page"{% endif %}>{{ item.label }}</a>
+          {% endif %}
+        {% endfor %}
+        <span class="nav-spacer"></span>
+        <div class="nav-meta">
+          <span class="nav-date">{{ today_label }}</span>
+          <span class="nav-user">{{ user.name }}</span>
+          <form method="post" action="/odhlasit" class="inline">
+            <button class="linklike" type="submit">Odhlásit</button>
+          </form>
+        </div>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% for f in flashes %}
+      <div class="flash {{ f.kind }}" role="status">{{ f.text }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

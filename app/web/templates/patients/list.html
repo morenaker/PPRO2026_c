@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_macros.html" import czech_count %}
+{% block title %}Pacienti{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Pacienti</h1>
+      <p class="sub">{% if q %}Výsledky pro „{{ q }}“{% else %}Hledejte podle příjmení nebo telefonu.{% endif %}</p>
+    </div>
+    <div class="tools">
+      <a class="btn" href="/pacienti/novy">Nový pacient</a>
+    </div>
+  </div>
+
+  <form class="toolbar" method="get" action="/pacienti" role="search">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <input type="search" name="q" value="{{ q }}" placeholder="Příjmení nebo telefon" aria-label="Hledat pacienta" autofocus>
+    </div>
+    <button class="btn secondary" type="submit">Hledat</button>
+    {% if q %}<a class="btn quiet" href="/pacienti">Zrušit hledání</a>{% endif %}
+  </form>
+
+  <section class="panel">
+    {% if patients %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col">Pacient</th>
+              <th scope="col">Rok narození</th>
+              <th scope="col">Telefon</th>
+              <th scope="col" class="hide-sm">Pojišťovna</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patients %}
+              <tr>
+                <td class="name">{{ p.last_name }} {{ p.first_name }}</td>
+                <td class="num">{{ p.birth_year }}</td>
+                <td class="num">{{ p.phone }}</td>
+                <td class="hide-sm">{{ p.insurer }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-note">{{ czech_count(patients | length, 'pacient', 'pacienti', 'pacientů') }}</div>
+    {% elif q %}
+      <div class="empty">
+        <h3>Nikoho jsme nenašli</h3>
+        <p>Zkontrolujte příjmení nebo zkuste telefon. Pokud jde o nového pacienta, založte ho.</p>
+        <a class="btn" href="/pacienti/novy">Nový pacient</a>
+      </div>
+    {% else %}
+      <div class="empty">
+        <h3>Zatím žádní pacienti</h3>
+        <p>Prvního pacienta založíte z telefonátu nebo u přepážky.</p>
+        <a class="btn" href="/pacienti/novy">Nový pacient</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

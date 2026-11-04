@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Nastavení{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Nastavení</h1>
+      <p class="sub">Ukázková data pro předvádění aplikace.</p>
+    </div>
+  </div>
+
+  <div class="layout-split">
+    <section class="panel" aria-labelledby="demo-h">
+      <div class="panel-head">
+        <h2 id="demo-h">Testovací data</h2>
+        {% if demo.present %}<span class="badge ok">Nahraná</span>{% else %}<span class="badge">Nenahraná</span>{% endif %}
+      </div>
+      <div class="panel-body">
+        <p class="muted">Syntetičtí pacienti, tři lékaři s ordinačními hodinami, číselník výkonů a rezervace
+          v okolí dneška (proběhlé, nadcházející i zrušené). Reálná data se neovlivní.</p>
+        <dl class="facts spaced">
+          <div><dt>Pacienti</dt><dd>{{ demo.patients }}</dd></div>
+          <div><dt>Lékaři</dt><dd>{{ demo.doctors }}</dd></div>
+          <div><dt>Výkony v číselníku</dt><dd>{{ demo.procedures }}</dd></div>
+          <div><dt>Rezervace</dt><dd>{{ demo.appointments }}</dd></div>
+        </dl>
+        <div class="actions spaced">
+          <form method="post" action="/nastaveni/testovaci-data/pridat">
+            <button class="btn" type="submit" {% if demo.present %}disabled{% endif %}>Přidat testovací data</button>
+          </form>
+          <form method="post" action="/nastaveni/testovaci-data/odebrat"
+                onsubmit="return confirm('Opravdu odebrat všechna testovací data včetně jejich rezervací a návštěv?')">
+            <button class="btn danger" type="submit" {% if not demo.present %}disabled{% endif %}>Odebrat testovací data</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="accounts-h">
+      <div class="panel-head"><h2 id="accounts-h">Ukázkové účty</h2></div>
+      <div class="panel-body">
+        <p class="muted">Účty <code>admin</code> a <code>recepce</code> se zakládají při startu aplikace. Hesla jdou
+          změnit proměnnými prostředí <code>DEMO_ADMIN_PASSWORD</code> a <code>DEMO_RECEPTION_PASSWORD</code>.</p>
+      </div>
+    </section>
+  </div>
+{% endblock %}

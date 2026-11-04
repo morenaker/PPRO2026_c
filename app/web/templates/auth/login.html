@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import brand_mark %}
+{% block title %}Přihlášení{% endblock %}
+{% block content %}
+  <div class="auth">
+    <div class="auth-brand">
+      {{ brand_mark() }}
+      <div>
+        <strong>Ordinace Na Vyhlídce</strong>
+        <span>MUDr. Jana Hrubá · recepce</span>
+      </div>
+    </div>
+
+    <form class="panel" method="post" action="/prihlaseni">
+      <div class="panel-body">
+        <h1 class="visually-hidden">Přihlášení</h1>
+        {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+        <label class="field"><span>Uživatelské jméno</span>
+          <input type="text" name="username" value="{{ username }}" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus></label>
+        <label class="field"><span>Heslo</span>
+          <input type="password" name="password" autocomplete="current-password" required></label>
+        <button class="btn block" type="submit">Přihlásit se</button>
+      </div>
+    </form>
+
+    <div class="demo">
+      Ukázkové účty pro předvedení, data jsou syntetická.
+      <table>
+        {% for a in accounts %}
+          <tr>
+            <td>{{ a.username }}</td>
+            <td><code>{{ a.password }}</code></td>
+            <td>{{ 'správce' if a.role == 'admin' else 'recepce' }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Diář{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Diář</h1>
+      <p class="sub">Rezervace od dneška. Zrušené zůstávají přeškrtnuté, termín je ale volný.</p>
+    </div>
+    <form class="tools" method="get" action="/rezervace">
+      <label class="visually-hidden" for="doctor-filter">Lékař</label>
+      <select id="doctor-filter" name="doctor_id" onchange="this.form.submit()">
+        <option value="">Všichni lékaři</option>
+        {% for d in doctors %}
+          <option value="{{ d.id }}" {% if d.id == doctor_id %}selected{% endif %}>{{ d.full_name }}</option>
+        {% endfor %}
+      </select>
+      <noscript><button class="btn secondary" type="submit">Zobrazit</button></noscript>
+    </form>
+  </div>
+
+  <section class="panel">
+    {% if appointments %}
+      <ul class="agenda">
+        {% set ns = namespace(day=None) %}
+        {% for a in appointments %}
+          {% set d = a.starts_at | local_date %}
+          {% if d != ns.day %}
+            {% set ns.day = d %}
+            <li class="agenda-day">{{ d | day }}</li>
+          {% endif %}
+          <li class="slot{{ ' is-cancelled' if a.status == 'cancelled' }}">
+            <span class="time">{{ a.starts_at | hm }}<span class="end">{{ a.ends_at | hm }}</span></span>
+            <span>
+              <span class="who">{{ a.patient.last_name }} {{ a.patient.first_name }}</span><br>
+              <span class="why">{{ a.reason }}</span>
+            </span>
+            <span class="doc">{{ a.doctor.full_name }}</span>
+            <span class="state">{{ status_badge(a.status) }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty">
+        <h3>Žádné rezervace</h3>
+        <p>{% if doctor_id %}Tento lékař zatím nemá od dneška nikoho objednaného.{% else %}Od dneška zatím nikdo není objednaný.{% endif %}</p>
+        {% if doctor_id %}<a class="btn secondary" href="/rezervace">Zobrazit všechny lékaře</a>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

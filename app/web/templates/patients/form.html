@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Nový pacient{% endblock %}
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Nový pacient</h1>
+      <p class="sub">Údaje z telefonátu nebo od přepážky. Vyplňte všechna pole.</p>
+    </div>
+  </div>
+
+  <form class="panel form-panel" method="post" action="/pacienti/novy">
+    <div class="panel-body padded">
+      {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+      <div class="form-grid">
+        <label class="field"><span>Jméno</span>
+          <input type="text" name="first_name" required autocomplete="off" value="{{ values.first_name or '' }}" autofocus></label>
+        <label class="field"><span>Příjmení</span>
+          <input type="text" name="last_name" required autocomplete="off" value="{{ values.last_name or '' }}"></label>
+        <label class="field"><span>Rok narození</span>
+          <input type="number" name="birth_year" min="1900" max="2100" required inputmode="numeric" value="{{ values.birth_year or '' }}"></label>
+        <label class="field"><span>Telefon</span>
+          <input type="tel" name="phone" required value="{{ values.phone or '' }}" placeholder="+420 …"></label>
+        <label class="field"><span>Číslo pojištěnce</span>
+          <input type="text" name="insurance_number" required autocomplete="off" value="{{ values.insurance_number or '' }}">
+          <span class="hint">Podle něj poznáme, jestli pacient už v evidenci není.</span></label>
+        <label class="field"><span>Pojišťovna</span>
+          <input type="text" name="insurer" required value="{{ values.insurer or '' }}"></label>
+      </div>
+      <div class="form-actions">
+        <button class="btn" type="submit">Uložit pacienta</button>
+        <a class="btn quiet" href="/pacienti">Zrušit</a>
+      </div>
+    </div>
+  </form>
+{% endblock %}
